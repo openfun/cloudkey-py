@@ -1,3 +1,9 @@
+cloudkey (1.2.0-1~karmic1) karmic-dc; urgency=low
+
+  * Support for live streaming
+
+ -- Sebastien Estienne <sebastien.estienne@gmail.com>  Fri, 06 May 2011 20:27:59 +0200
+
 cloudkey (1.1.4-1~karmic1) karmic-dc; urgency=low
 
   * get_stream_url returns static urls for thumbnail

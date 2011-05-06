@@ -4,7 +4,7 @@ import sys
 
 API_ENDPOINT = '/api'
 
-__version__ = "1.1.4"
+__version__ = "1.2.0"
 __python_version__ = '.'.join([str(i) for i in sys.version_info[:3]])
 _DEBUG = False
 
@@ -115,25 +115,19 @@ def normalize(arg=None):
     """
     res = ''
 
-    if type(arg) in (list, tuple):
+    t_arg = type(arg)
+    if t_arg in (list, tuple):
         for i in arg:
-            if type(i) in (dict, list, tuple):
-                i = normalize(i)
-            if i != None:
-                res += str(i)
-
-    elif type(arg) is dict:
+            res += normalize(i)
+    elif t_arg is dict:
         keys = arg.keys()
         keys.sort()
         for key in keys:
-            i = arg[key]
-            if type(i) in (dict, list, tuple):
-                i = normalize(i)
-            if i != None:
-                res += '%s%s' % (key, i)
-            else:
-                res += str(key)
-
+            res += '%s%s' % (normalize(key), normalize(arg[key]))
+    elif t_arg is unicode:
+        res = arg.encode('utf8')
+    elif t_arg is bool:
+        res = 'true' if arg else 'false'
     elif arg != None:
         res = str(arg)
 
@@ -391,7 +385,7 @@ class MediaObject(ClientObject):
     def get_qtref_url(self, id, seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None):
         if type(id) not in (str, unicode):
             raise InvalidParameter('id is not valid')
-        url = '%s/qtref/%s/%s.mov' % (self._client._base_url, self._client._user_id, id)
+        url = '%s/stream/%s/%s.mov' % (self._client._base_url, self._client._user_id, id)
         return sign_url(url, self._client._api_key, seclevel=seclevel, asnum=asnum, ip=ip, useragent=useragent, countries=countries, referers=referers, expires=expires)
 
     def get_stream_url(self, id, asset_name='mp4_h264_aac', seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None, download=False, cdn_url='http://cdn.dmcloud.net'):
@@ -404,6 +398,16 @@ class MediaObject(ClientObject):
         url = '%s/route/%s/%s/%s.%s' % (cdn_url, self._client._user_id, id, asset_name, asset_name.split('_')[0])
         return sign_url(url, self._client._api_key, seclevel=seclevel, asnum=asnum, ip=ip, useragent=useragent, countries=countries, referers=referers, expires=expires) \
             + ('&throttle=0&helper=0&cache=0' if download else '')
+
+
+class LiveStreamingObject(ClientObject):
+
+    def get_publish_url(self, id, preset='default', seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None, cdn_url='http://cdn.dmcloud.net'):
+        if type(id) not in (str, unicode):
+            raise InvalidParameter('id is not valid')
+        url = '%s/route/%s/live-%s/%s' % (cdn_url, self._client._user_id, id, preset)
+        return sign_url(url, self._client._api_key, seclevel=seclevel, asnum=asnum, ip=ip, useragent=useragent, countries=countries, referers=referers, expires=expires)
+
 
 class CloudKey(object):
 
@@ -421,8 +425,9 @@ class CloudKey(object):
         if method == 'file':
             return FileObject(self, method)
         if method == 'media':
-            media = MediaObject(self, method)
-            return media
+            return MediaObject(self, method)
+        if method == 'live_streaming':
+            return LiveStreamingObject(self, method)
         return ClientObject(self, method)
 
     def act_as_user(self, user):
