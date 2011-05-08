@@ -400,15 +400,6 @@ class MediaObject(ClientObject):
             + ('&throttle=0&helper=0&cache=0' if download else '')
 
 
-class LiveStreamingObject(ClientObject):
-
-    def get_publish_url(self, id, preset='default', seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None, cdn_url='http://cdn.dmcloud.net'):
-        if type(id) not in (str, unicode):
-            raise InvalidParameter('id is not valid')
-        url = '%s/route/%s/live-%s/%s' % (cdn_url, self._client._user_id, id, preset)
-        return sign_url(url, self._client._api_key, seclevel=seclevel, asnum=asnum, ip=ip, useragent=useragent, countries=countries, referers=referers, expires=expires)
-
-
 class CloudKey(object):
 
     def __init__(self, user_id, api_key, base_url='http://api.dmcloud.net', proxy=None, debug=False):
@@ -426,8 +417,6 @@ class CloudKey(object):
             return FileObject(self, method)
         if method == 'media':
             return MediaObject(self, method)
-        if method == 'live_streaming':
-            return LiveStreamingObject(self, method)
         return ClientObject(self, method)
 
     def act_as_user(self, user):
