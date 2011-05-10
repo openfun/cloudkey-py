@@ -69,7 +69,7 @@ def sign_url(url, secret, seclevel=None, asnum=None, ip=None, useragent=None, co
                 countries = '-' + ','.join(countries[1:])
             else:
                 countries = ','.join(countries)
-            if not re.match(r'^-?(?:[a-zA-Z]{2})(:?,[a-zA-Z]{2})*$', countries):
+            if not re.match(r'^-?(?:[a-zA-Z]{2})(?:,[a-zA-Z]{2})*$', countries):
                 raise ValueError('Invalid format for COUNTRY security level parameter.')
             public_secparams.append('cc=%s' % countries.lower())
         if seclevel & SecLevel.REFERER:
