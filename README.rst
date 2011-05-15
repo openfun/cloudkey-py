@@ -83,7 +83,7 @@ Media object
       // Create an embed URL limited only to the AS of the end-user and valid for 1 hour
       url = cloudkey.media.get_embed_url(id=media['id'], seclevel=SecLevel.DELEGATE | SecLevel.ASNUM, expires=time() + 3600)
    
-.. function:: get_stream_url(id, preset='mp4_h264_aac', seclevel=None, asnum=None, ip=None, useragent=None, expires=None)
+.. function:: get_stream_url(id, asset_name='mp4_h264_aac', seclevel=None, asnum=None, ip=None, useragent=None, expires=None)
 
    This method returns a signed URL to a Dailymotion Cloud video stream (see the API reference for details).
 
@@ -91,8 +91,8 @@ Media object
 
    :param id: the id of the new media object.
    :type id: media ID
-   :param preset: the desired media asset preset name (default is ``mp4_h264_aac``).
-   :type preset: str
+   :param asset_name: the desired media asset asset_name name (default is ``mp4_h264_aac``).
+   :type asset_name: str
    :param seclevel: the security level bitmask (default is ``SecLevel.NONE``, see below for details).
    :type seclevel: int
    :param expires: the UNIX epoch expiration time (default is ``time() + 7200`` (2 hours from now)).
