@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os, sys
 
-version = open("cloudkey/version.txt").read().strip()
+version = open("version.txt").read().strip()
 setup(name='cloudkey',
       version=version,
       description='Dailymotion Cloud API client library',
