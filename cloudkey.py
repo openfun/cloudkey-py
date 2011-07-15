@@ -395,7 +395,9 @@ class MediaObject(ClientObject):
             base_url = cdn_url.replace('cdn.', 'static.')
             ts = '-%d' % int(expires) if expires else ''
             return '%s/%s/%s/%s%s.jpeg' % (base_url, self._client._user_id, id, asset_name, ts)
-        url = '%s/route/%s/%s/%s.%s' % (cdn_url, self._client._user_id, id, asset_name, asset_name.split('_')[0])
+        extension = asset_name.split('_')[0]
+        if extension == 'f4f': extension = 'f4m'
+        url = '%s/route/%s/%s/%s.%s' % (cdn_url, self._client._user_id, id, asset_name, extension)
         return sign_url(url, self._client._api_key, seclevel=seclevel, asnum=asnum, ip=ip, useragent=useragent, countries=countries, referers=referers, expires=expires) \
             + ('&throttle=0&helper=0&cache=0' if download else '')
 
