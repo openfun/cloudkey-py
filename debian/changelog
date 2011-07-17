@@ -1,3 +1,9 @@
+cloudkey (1.2.1-1~karmic1) karmic-dc; urgency=low
+
+  * cosmetic fix
+
+ -- Sebastien Estienne <sebastien.estienne@gmail.com>  Sun, 17 Jul 2011 15:57:49 +0200
+
 cloudkey (1.2.0-1~karmic1) karmic-dc; urgency=low
 
   * Support for live streaming
