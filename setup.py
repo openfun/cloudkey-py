@@ -5,7 +5,7 @@ setup(name='cloudkey',
       version='1.2.1',
       description='Dailymotion Cloud API client library',
       long_description=open("README.txt").read(),
-      download_url='https://github.com/dailymotion/cloudkey-py/zipball/1.2.0',
+      download_url='https://github.com/dailymotion/cloudkey-py/zipball/1.2.1',
       classifiers=[
         "Programming Language :: Python",
         "Development Status :: 5 - Production/Stable",
