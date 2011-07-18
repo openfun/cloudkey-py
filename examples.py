@@ -80,6 +80,12 @@ media_ = cloudkey.media.create(url=media_url, assets_names=['flv_h263_mp3',
 # we get the media id
 media_id =  media_['id']
 
+# we set a thumbnail from a url (jpeg format)
+cloudkey.media.set_thumbnail(id=media_id, url='http://t3.gstatic.com/images?q=tbn:ANd9GcT4cebUDh0VtSjfE_HXg7t9tsTpriGkRFn5AnK7ti07XzpkKhJY')
+
+# we set a thumbnail based on a timecode (format = HH:MM:SS.mm - HH: 2 digits hours, MM: 2 digits minutes, SS: 2 digits seconds, mm: 2 digits ms)
+cloudkey.media.set_thumbnail(id=media_id, timecode='00:00:01.00', force=True)
+
 #
 # Playing media
 #
@@ -97,6 +103,9 @@ print cloudkey.media.info(id=media_id,
 #
 # We list the assets of the media we just uploaded
 print cloudkey.media.get_assets(id=media_id)
+
+# We list the media ids
+print [d['id'] for d in cloudkey.media.list(fields=['id'])['list']]
 
 # Print some info about our media
 for m in cloudkey.media.list(fields=['id',
