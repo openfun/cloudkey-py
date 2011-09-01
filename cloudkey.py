@@ -288,7 +288,7 @@ class ClientObject(object):
 
 
             c = pycurl.Curl()
-            c.setopt(pycurl.URL, self._client._api_endpoint)
+            c.setopt(pycurl.URL, str(self._client._api_endpoint))
             c.setopt(pycurl.USERAGENT, 'cloudkey-py/%s (Python %s)' % (__version__, __python_version__))
             c.setopt(pycurl.HTTPHEADER, ["Content-Type: application/json", 'Expect:'])
 
@@ -305,7 +305,7 @@ class ClientObject(object):
                 data = json.dumps(request, cls=JSONEncoder)
             except (TypeError, ValueError), e:
                 raise SerializerError(str(e))
-                
+
             c.setopt(pycurl.POSTFIELDS, data)
 
             if self._client._proxy:
