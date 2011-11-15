@@ -44,12 +44,12 @@ code would be as follows::
   USER_ID = '4c1a4d3edede832bfd000002'
   API_KEY = '52a32c7890338770e3ea1601214c02142d297298'
 
-  cloudkey = CloudKey(USER_ID, API_KEY, BASE_URL)
+  cloudkey = CloudKey(USER_ID, API_KEY)
   cloudkey.media.list()
 
 For methods expecting parameters, these must be passed as named arguments::
 
-  clouckey.media.list(fields=['id'], per_page=20, page=2)
+  cloudkey.media.list(fields=['id'], per_page=20, page=2)
 
 The returned values are a direct mapping of the JSON structure into python's
 native types.
@@ -64,10 +64,14 @@ Local methods
 
   Upload a local file to Dailymotion Cloud using its path.
 
-  :param file: the path of the file
+  :param file: the path to the file
   :type file: str
   :returns: A dict containing the ``url`` where the uploaded file can be accessed
   :rtype: dict
+
+  Example::
+
+    result = cloudkey.file.upload_file("/path/to/file.mkv")
 
 
 `Media object`_
@@ -170,7 +174,7 @@ user or a group of users. The different (combinable) options are:
   - ``SecLevel.DELEGATE``: the ASNUM, IP and User-Agent values
     are to be gathered at the server side during the first URL
     access and don't need to be specified at the client side
-    beforehand (this is the recommanded approach as it will
+    beforehand (this is the recommended approach as it will
     ensure a 100%-accurate ASNUM recognition).
   - ``SecLevel.USEONCE``: the URL access is granted once only
     (using this option will probably prevent seeking from working correctly).
