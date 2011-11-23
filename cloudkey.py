@@ -388,7 +388,7 @@ class MediaObject(ClientObject):
         url = '%s/stream/%s/%s.mov' % (self._client._base_url, self._client._user_id, id)
         return sign_url(url, self._client._api_key, seclevel=seclevel, asnum=asnum, ip=ip, useragent=useragent, countries=countries, referers=referers, expires=expires)
 
-    def get_stream_url(self, id, asset_name='mp4_h264_aac', seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None, download=False, cdn_url='http://cdn.dmcloud.net'):
+    def get_stream_url(self, id, asset_name='mp4_h264_aac', seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None, download=False, version=None, cdn_url='http://cdn.dmcloud.net'):
         if type(id) not in (str, unicode):
             raise InvalidParameter('id is not valid')
         if asset_name.startswith('jpeg_thumbnail_'):
@@ -396,8 +396,10 @@ class MediaObject(ClientObject):
             ts = '-%d' % int(expires) if expires else ''
             return '%s/%s/%s/%s%s.jpeg' % (base_url, self._client._user_id, id, asset_name, ts)
         extension = asset_name.split('_')[0]
-        if extension == 'f4f': extension = 'f4m'
-        url = '%s/route/%s/%s/%s.%s' % (cdn_url, self._client._user_id, id, asset_name, extension)
+        if extension == 'f4f':
+            extension = 'f4m'
+        version = '-%d' % version if version else ''
+        url = '%s/route/%s/%s/%s%s.%s' % (cdn_url, self._client._user_id, id, asset_name, version, extension)
         return sign_url(url, self._client._api_key, seclevel=seclevel, asnum=asnum, ip=ip, useragent=useragent, countries=countries, referers=referers, expires=expires) \
             + ('&throttle=0&helper=0&cache=0' if download else '')
 
