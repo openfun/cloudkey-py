@@ -114,7 +114,7 @@ Local methods
                                     expires=time() + 3600)
 
 ``get_stream_url(id, preset='mp4_h264_aac', seclevel=None,
-asnum=None, ip=None, useragent=None, expires=None)``
+asnum=None, ip=None, useragent=None, expires=None, version=None)``
 
   This method returns a signed URL to a Dailymotion Cloud video stream
   (see the API reference for details).
@@ -133,6 +133,9 @@ asnum=None, ip=None, useragent=None, expires=None)``
   :param expires: the UNIX epoch expiration time
     (default is ``time() + 7200`` (2 hours from now)).
   :type expires: int
+  :param version: arbitrary integer inserted in the url for the cache flush.
+    Use this parameter only if needed, and change its value only when a cache flush is required.
+  :type version: int
 
   The following arguments may be required if the ``SecLevel.DELEGATE``
   option is not specified in the seclevel parameter, depending on the other

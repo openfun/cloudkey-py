@@ -1,3 +1,9 @@
+cloudkey (1.2.2-1~karmic1) karmic-dc; urgency=low
+
+  * Added a version parameter for stream url
+
+ --  <jererc@gmail.com>  Thu, 24 Nov 2011 14:51:56 +0100
+
 cloudkey (1.2.1-1~karmic1) karmic-dc; urgency=low
 
   * cosmetic fix

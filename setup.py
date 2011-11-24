@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import os, sys
 
 setup(name='cloudkey',
-      version='1.2.1',
+      version='1.2.2',
       description='Dailymotion Cloud API client library',
       long_description=open("README.txt").read(),
       download_url='https://github.com/dailymotion/cloudkey-py/zipball/1.2.1',
