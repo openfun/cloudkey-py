@@ -4,7 +4,7 @@ import sys
 
 API_ENDPOINT = '/api'
 
-__version__ = "1.2.1"
+__version__ = "1.2.3"
 __python_version__ = '.'.join([str(i) for i in sys.version_info[:3]])
 _DEBUG = False
 
@@ -41,7 +41,7 @@ class SecLevel:
 def sign_url(url, secret, seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None):
     # Normalize parameters
     seclevel = seclevel or SecLevel.NONE
-    expires  = int(expires or time.time() + 7200)
+    expires = int(expires or time.time() + 7200)
 
     # Compute digest
     (url, unused, query) = url.partition('?')
@@ -82,7 +82,7 @@ def sign_url(url, secret, seclevel=None, asnum=None, ip=None, useragent=None, co
     public_secparams_encoded = ''
     if len(public_secparams) > 0:
         public_secparams_encoded = base64.b64encode(zlib.compress('&'.join(public_secparams)))
-    rand   = ''.join(random.choice(string.ascii_lowercase + string.digits) for unused in range(8))
+    rand = ''.join(random.choice(string.ascii_lowercase + string.digits) for unused in range(8))
     digest = hashlib.md5('%d%s%d%s%s%s%s' % (seclevel, url, expires, rand, secret, secparams, public_secparams_encoded)).hexdigest()
 
     # Return signed URL
@@ -388,7 +388,7 @@ class MediaObject(ClientObject):
         url = '%s/stream/%s/%s.mov' % (self._client._base_url, self._client._user_id, id)
         return sign_url(url, self._client._api_key, seclevel=seclevel, asnum=asnum, ip=ip, useragent=useragent, countries=countries, referers=referers, expires=expires)
 
-    def get_stream_url(self, id, asset_name='mp4_h264_aac', seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None, download=False, version=None, cdn_url='http://cdn.dmcloud.net'):
+    def get_stream_url(self, id, asset_name='mp4_h264_aac', seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None, download=False, filename=None, version=None, cdn_url='http://cdn.dmcloud.net'):
         if type(id) not in (str, unicode):
             raise InvalidParameter('id is not valid')
         version = '-%d' % version if version else ''
@@ -399,9 +399,11 @@ class MediaObject(ClientObject):
         extension = asset_name.split('_')[0]
         if extension == 'f4f':
             extension = 'f4m'
-        url = '%s/route/%s/%s/%s%s.%s' % (cdn_url, self._client._user_id, id, asset_name, version, extension)
-        return sign_url(url, self._client._api_key, seclevel=seclevel, asnum=asnum, ip=ip, useragent=useragent, countries=countries, referers=referers, expires=expires) \
-            + ('&throttle=0&helper=0&cache=0' if download else '')
+        protocol = 'http' if download or filename else None
+        url = '%s/route%s/%s/%s/%s%s.%s' % (cdn_url, '/%s' % protocol if protocol else '', self._client._user_id, id, asset_name, version, extension)
+        if filename:
+            url = '%s%s%s' % (url, '&' if '?' in url else '?', urllib.urlencode({'filename': filename.encode('utf-8', 'ignore')}))
+        return sign_url(url, self._client._api_key, seclevel=seclevel, asnum=asnum, ip=ip, useragent=useragent, countries=countries, referers=referers, expires=expires)
 
 
 class CloudKey(object):
