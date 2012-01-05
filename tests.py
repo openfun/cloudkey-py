@@ -3,6 +3,8 @@ try:
 except ImportError, e:
     import unittest
 
+from urllib import urlencode
+
 from mock import patch, Mock
 
 import cloudkey
@@ -102,13 +104,13 @@ class GetStreamUrl(unittest.TestCase):
         asset_name = 'mp4_h264_aac'
         extension = 'mp4'
         download = False
-        filename = 'test_filename.mp4'
+        filename = 'test_&!filename.mp4'
 
         with patch.object(cloudkey, 'sign_url') as sign_url_mock:
             sign_url_mock.side_effect = no_sign_url
             res = self.media.get_stream_url(self.id, asset_name=asset_name, download=download, filename=filename, cdn_url=self.cdn_url)
 
-        self.assertEquals(res, '%s/route/http/%s/%s/%s.%s?filename=%s' % (self.cdn_url, self.client._user_id, self.id, asset_name, extension, filename))
+        self.assertEquals(res, '%s/route/http/%s/%s/%s.%s?%s' % (self.cdn_url, self.client._user_id, self.id, asset_name, extension, urlencode({'filename': filename.encode('utf-8', 'ignore')})))
         self.assertTrue(sign_url_mock.called)
 
 
