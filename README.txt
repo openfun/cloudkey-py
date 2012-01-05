@@ -133,12 +133,12 @@ asnum=None, ip=None, useragent=None, expires=None, version=None)``
   :param expires: the UNIX epoch expiration time
     (default is ``time() + 7200`` (2 hours from now)).
   :type expires: int
-  :param download: True to get the download url
+  :param download: ``True`` to get the download url
     (default is ``False``).
-  :type expires: bool
-  :param filename: the download url filename,
+  :type download: bool
+  :param filename: the download url filename.
     It overrides the download parameter if set.
-  :type expires: str
+  :type filename: str
   :param version: arbitrary integer inserted in the url for the cache flush.
     Use this parameter only if needed, and modify its value only when a cache flush is required.
   :type version: int
