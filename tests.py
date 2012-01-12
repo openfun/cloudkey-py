@@ -113,6 +113,27 @@ class GetStreamUrl(unittest.TestCase):
         self.assertEquals(res, '%s/route/http/%s/%s/%s.%s?%s' % (self.cdn_url, self.client._user_id, self.id, asset_name, extension, urlencode({'filename': filename.encode('utf-8', 'ignore')})))
         self.assertTrue(sign_url_mock.called)
 
+    def test_get_stream_url_bad_protocol(self):
+        asset_name = 'mp4_h264_aac'
+        extension = 'mp4'
+        protocol = 'bad'
+
+        with patch.object(cloudkey, 'sign_url') as sign_url_mock:
+            sign_url_mock.side_effect = no_sign_url
+            self.assertRaises(cloudkey.InvalidParameter, self.media.get_stream_url, self.id, asset_name=asset_name, protocol=protocol, cdn_url=self.cdn_url)
+
+    def test_get_stream_url_protocol_http(self):
+        asset_name = 'mp4_h264_aac'
+        extension = 'mp4'
+        protocol = 'http'
+
+        with patch.object(cloudkey, 'sign_url') as sign_url_mock:
+            sign_url_mock.side_effect = no_sign_url
+            res = self.media.get_stream_url(self.id, asset_name=asset_name, protocol=protocol, cdn_url=self.cdn_url)
+
+        self.assertEquals(res, '%s/route/%s/%s/%s/%s.%s' % (self.cdn_url, protocol, self.client._user_id, self.id, asset_name, extension))
+        self.assertTrue(sign_url_mock.called)
+
 
 class GetEmbedUrl(unittest.TestCase):
 

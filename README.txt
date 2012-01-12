@@ -142,6 +142,8 @@ asnum=None, ip=None, useragent=None, expires=None, version=None)``
   :param version: arbitrary integer inserted in the url for the cache flush.
     Use this parameter only if needed, and modify its value only when a cache flush is required.
   :type version: int
+  :param protocol: streaming protocol ('hls', 'rtmp', 'hps' or 'http'). Overrides the `download` parameter if 'http'.
+  :type protocol: str
 
   The following arguments may be required if the ``SecLevel.DELEGATE``
   option is not specified in the seclevel parameter, depending on the other
