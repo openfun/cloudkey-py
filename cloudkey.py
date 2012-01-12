@@ -4,7 +4,7 @@ import sys
 
 API_ENDPOINT = '/api'
 
-__version__ = "1.2.3"
+__version__ = "1.2.4"
 __python_version__ = '.'.join([str(i) for i in sys.version_info[:3]])
 _DEBUG = False
 
