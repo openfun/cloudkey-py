@@ -77,7 +77,7 @@ Local methods
 `Media object`_
 ^^^^^^^^^^^^^^^
 
-``get_embed_url(id, seclevel=None, asnum=None, ip=None, useragent=None, expires=None)``
+``get_embed_url(id, seclevel=None, asnum=None, ip=None, useragent=None, expires=None, secure=False)``
 
   This method returns a signed URL to a Dailymotion Cloud player embed
   (see the API reference for details).
@@ -92,6 +92,9 @@ Local methods
   :param expires: the UNIX epoch expiration time
     (default is ``time() + 7200`` (2 hours from now)).
   :type expires: int
+  :param secure: ``True`` to get a https url.
+    (default is ``False``).
+  :type secure: bool
 
   The following arguments may be required if the ``SecLevel.DELEGATE``
   option is not specified in the seclevel parameter, depending on the other
