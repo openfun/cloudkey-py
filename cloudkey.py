@@ -375,10 +375,11 @@ class FileObject(ClientObject):
 
 class MediaObject(ClientObject):
 
-    def get_embed_url(self, id, seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None, skin=None):
+    def get_embed_url(self, id, seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None, skin=None, secure=False):
         if type(id) not in (str, unicode):
             raise InvalidParameter('id is not valid')
-        url = '%s/embed/%s/%s' % (self._client._base_url, self._client._user_id, id)
+        base_url = self._client._secure_base_url if secure else self._client._base_url
+        url = '%s/embed/%s/%s' % (base_url, self._client._user_id, id)
         return sign_url(url, self._client._api_key, seclevel=seclevel, asnum=asnum, ip=ip, useragent=useragent, countries=countries, referers=referers, expires=expires) \
             + ('skin=%s' % skin if skin else '')
 
@@ -416,6 +417,7 @@ class CloudKey(object):
         self._user_id = user_id if user_id else ''
         self._api_key = api_key if api_key else ''
         self._base_url = base_url
+        self._secure_base_url = base_url.replace('http:', 'https:')
         self._act_as_user = None
         self._api_endpoint =  base_url + API_ENDPOINT
         self._proxy = proxy

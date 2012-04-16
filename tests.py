@@ -142,6 +142,7 @@ class GetEmbedUrl(unittest.TestCase):
         self.client._user_id = '1' * 24
         self.client._api_key = '9' * 42
         self.client._base_url = 'http://base.url'
+        self.client._secure_base_url = 'https://base.url'
 
         self.media = cloudkey.MediaObject(self.client, 'name')
         self.id = '2' * 24
@@ -152,6 +153,14 @@ class GetEmbedUrl(unittest.TestCase):
             res = self.media.get_embed_url(self.id)
 
         self.assertEquals(res, '%s/embed/%s/%s' % (self.client._base_url, self.client._user_id, self.id))
+        self.assertEquals(sign_url_mock.call_args[0], (res, self.client._api_key))
+
+    def test_get_embed_url_https(self):
+        with patch.object(cloudkey, 'sign_url') as sign_url_mock:
+            sign_url_mock.side_effect = no_sign_url
+            res = self.media.get_embed_url(self.id, secure=True)
+
+        self.assertEquals(res, '%s/embed/%s/%s' % (self.client._secure_base_url, self.client._user_id, self.id))
         self.assertEquals(sign_url_mock.call_args[0], (res, self.client._api_key))
 
 
