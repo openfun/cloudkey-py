@@ -4,7 +4,7 @@ import sys
 
 API_ENDPOINT = '/api'
 
-__version__ = "1.2.4"
+__version__ = "1.2.6"
 __python_version__ = '.'.join([str(i) for i in sys.version_info[:3]])
 _DEBUG = False
 
@@ -433,13 +433,12 @@ class MediaObject(ClientObject):
     def get_stream_url(self, id, asset_name='mp4_h264_aac', seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None, download=False, filename=None, version=None, protocol=None, cdn_url='http://cdn.dmcloud.net'):
         if type(id) not in (str, unicode):
             raise InvalidParameter('id is not valid')
-        if protocol not in (None, 'hls', 'rtmp', 'hps', 'http'):
+        if protocol not in (None, 'hls', 'rtmp', 'hps', 'http', 'ss', 'hds'):
             raise InvalidParameter('%s is not a valid streaming protocol' % protocol)
         version = '-%d' % version if version else ''
         if asset_name.startswith('jpeg_thumbnail_'):
             base_url = cdn_url.replace('cdn.', 'static.')
-            ts = '-%d' % int(expires) if expires else ''
-            return '%s/%s/%s/%s%s%s.jpeg' % (base_url, self._client._user_id, id, asset_name, ts, version)
+            return '%s/%s/%s/%s%s.jpeg' % (base_url, self._client._user_id, id, asset_name, version)
         extension = asset_name.split('_')[0]
         if download or filename:
             protocol = 'http'
@@ -452,7 +451,7 @@ class MediaObject(ClientObject):
         url = '%s/route%s/%s/%s/%s%s.%s' % (cdn_url, '/%s' % protocol if protocol else '', self._client._user_id, id, asset_name, version, extension)
 
         if filename:
-            url = '%s%s%s' % (url, '&' if '?' in url else '?', urllib.urlencode({'filename': filename.encode('utf-8', 'ignore')}))
+            url = '%s?%s' % (url, urllib.urlencode({'filename': filename.encode('utf-8', 'ignore')}))
 
         return sign_url(url, self._client._api_key, seclevel=seclevel, asnum=asnum, ip=ip, useragent=useragent, countries=countries, referers=referers, expires=expires)
 
