@@ -182,3 +182,6 @@ class GetQtrefUrl(unittest.TestCase):
 
         self.assertEquals(res, '%s/stream/%s/%s.mov' % (self.client._base_url, self.client._user_id, self.id))
         self.assertEquals(sign_url_mock.call_args[0], (res, self.client._api_key))
+
+if __name__ == '__main__':
+    unittest.main()

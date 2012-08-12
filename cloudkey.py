@@ -81,7 +81,7 @@ def sign_url(url, secret, seclevel=None, asnum=None, ip=None, useragent=None, co
 
     public_secparams_encoded = ''
     if len(public_secparams) > 0:
-        public_secparams_encoded = base64.b64encode(zlib.compress('&'.join(public_secparams)))
+        public_secparams_encoded = base64.urlsafe_b64encode(zlib.compress('&'.join(public_secparams)))
     rand = ''.join(random.choice(string.ascii_lowercase + string.digits) for unused in range(8))
     digest = hashlib.md5('%d%s%d%s%s%s%s' % (seclevel, url, expires, rand, secret, secparams, public_secparams_encoded)).hexdigest()
 
@@ -147,7 +147,31 @@ def sign(shared_secret, msg):
      >>> sign('sEcReT_KeY', 'hello world')
      '5f048ebaf6f06576b60716dc8f815d85'
     """
-    return hashlib.md5(msg.encode('utf-8') + shared_secret).hexdigest()
+    if isinstance(msg, unicode):
+        msg = msg.encode('utf8')
+    return hashlib.md5(msg + shared_secret).hexdigest()
+
+DRM_TOKEN_TIMEOUT = 600
+
+def gen_drm_token(user_id, media_id, api_key, expires=0, rights=None, data=None, callback=None, encode=True):
+    info = {
+        'user_id': user_id,
+        'media_id': media_id,
+        'expires': expires if expires and isinstance(expires, int) else int(time.time() + DRM_TOKEN_TIMEOUT),
+    }
+    if isinstance(rights, dict):
+        info['rights'] = rights
+    if isinstance(data, dict):
+        info['data'] = data
+    if isinstance(callback, (str, unicode)):
+        info['callback'] = callback
+
+    info['auth'] = sign(api_key, normalize(data))
+
+    payload = json.dumps(info)
+    if encode:
+        return base64.urlsafe_b64encode(payload)
+    return payload
 
 #################################################################################
 class RPCException(Exception):
@@ -347,6 +371,9 @@ class FileObject(ClientObject):
             raise IOError("[Errno 2] No such file or directory: '%s'" % file)
         result = self.upload()
 
+        if isinstance(file, unicode):
+            file = file.encode('utf8')
+
         c = pycurl.Curl()
         c.setopt(pycurl.URL, str(result['url']))
         c.setopt(pycurl.USERAGENT, 'cloudkey-py/%s (Python %s)' % (__version__, __python_version__))
@@ -375,13 +402,27 @@ class FileObject(ClientObject):
 
 class MediaObject(ClientObject):
 
-    def get_embed_url(self, id, seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None, skin=None, secure=False):
+    def _get_url(self, base_path, id, seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None, skin=None, drm_token=None, secure=False):
         if type(id) not in (str, unicode):
             raise InvalidParameter('id is not valid')
         base_url = self._client._secure_base_url if secure else self._client._base_url
-        url = '%s/embed/%s/%s' % (base_url, self._client._user_id, id)
-        return sign_url(url, self._client._api_key, seclevel=seclevel, asnum=asnum, ip=ip, useragent=useragent, countries=countries, referers=referers, expires=expires) \
-            + ('skin=%s' % skin if skin else '')
+        url = '%s%s/%s/%s' % (base_url, base_path, self._client._user_id, id)
+        url = sign_url(url, self._client._api_key, seclevel=seclevel, asnum=asnum, ip=ip, useragent=useragent, countries=countries, referers=referers, expires=expires) \
+            + ('&skin=%s' % skin if skin else '')
+        if drm_token:
+            drm_token = gen_drm_token(self._client._user_id, id, self._client._api_key, \
+                                          expires=drm_token.get('expires'), \
+                                          rights=drm_token.get('rights'), \
+                                          data=drm_token.get('data'), \
+                                          callback=drm_token.get('callback'))
+            url += '&drm_token=%s' % drm_token
+        return url
+
+    def get_embed_url(self, id, seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None, skin=None, drm_token=None, secure=False):
+        return self._get_url('/embed', id, seclevel, asnum, ip, useragent, countries, referers, expires, skin, drm_token, secure)
+
+    def get_swf_url(self, id, seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None, skin=None, drm_token=None, secure=False):
+        return self._get_url('/player/swf', id, seclevel, asnum, ip, useragent, countries, referers, expires, skin, drm_token, secure)
 
     def get_qtref_url(self, id, seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None):
         if type(id) not in (str, unicode):
@@ -400,13 +441,19 @@ class MediaObject(ClientObject):
             ts = '-%d' % int(expires) if expires else ''
             return '%s/%s/%s/%s%s%s.jpeg' % (base_url, self._client._user_id, id, asset_name, ts, version)
         extension = asset_name.split('_')[0]
-        if extension == 'f4f':
-            extension = 'f4m'
         if download or filename:
             protocol = 'http'
+
+        if extension == 'abs':
+            extension = ''
+            if not protocol:
+                raise InvalidParameter('protocol is required for abs asset_name')
+
         url = '%s/route%s/%s/%s/%s%s.%s' % (cdn_url, '/%s' % protocol if protocol else '', self._client._user_id, id, asset_name, version, extension)
+
         if filename:
             url = '%s%s%s' % (url, '&' if '?' in url else '?', urllib.urlencode({'filename': filename.encode('utf-8', 'ignore')}))
+
         return sign_url(url, self._client._api_key, seclevel=seclevel, asnum=asnum, ip=ip, useragent=useragent, countries=countries, referers=referers, expires=expires)
 
 
