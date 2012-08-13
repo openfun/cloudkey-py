@@ -78,13 +78,13 @@ class GetStreamUrl(unittest.TestCase):
     def test_get_stream_url_timestamp_static(self):
         asset_name = 'jpeg_thumbnail_medium'
         extension = 'jpeg'
-        expires = '123456'
+        version = 123456
 
         with patch.object(cloudkey, 'sign_url') as sign_url_mock:
             sign_url_mock.side_effect = no_sign_url
-            res = self.media.get_stream_url(self.id, asset_name=asset_name, expires=expires, cdn_url=self.cdn_url)
+            res = self.media.get_stream_url(self.id, asset_name=asset_name, version=version, cdn_url=self.cdn_url)
 
-        self.assertEquals(res, '%s/%s/%s/%s-%s.%s' % (self.static_url, self.client._user_id, self.id, asset_name, expires, extension))
+        self.assertEquals(res, '%s/%s/%s/%s-%s.%s' % (self.static_url, self.client._user_id, self.id, asset_name, version, extension))
         self.assertFalse(sign_url_mock.called)
 
     def test_get_stream_url_download_no_filename(self):
