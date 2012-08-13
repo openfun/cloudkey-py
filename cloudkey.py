@@ -153,7 +153,7 @@ def sign(shared_secret, msg):
 
 DRM_TOKEN_TIMEOUT = 600
 
-def gen_drm_token(user_id, media_id, api_key, expires=0, rights=None, data=None, callback=None, encode=True):
+def gen_drm_token(user_id, media_id, api_key, rights=None, data=None, callback=None, expires=0, encode=True):
     info = {
         'user_id': user_id,
         'media_id': media_id,
@@ -439,16 +439,16 @@ class MediaObject(ClientObject):
         if asset_name.startswith('jpeg_thumbnail_'):
             base_url = cdn_url.replace('cdn.', 'static.')
             return '%s/%s/%s/%s%s.jpeg' % (base_url, self._client._user_id, id, asset_name, version)
-        extension = asset_name.split('_')[0]
+        extension = '.%s' % asset_name.split('_')[0]
         if download or filename:
             protocol = 'http'
 
-        if extension == 'abs':
+        if extension == '.abs':
             extension = ''
             if not protocol:
                 raise InvalidParameter('protocol is required for abs asset_name')
 
-        url = '%s/route%s/%s/%s/%s%s.%s' % (cdn_url, '/%s' % protocol if protocol else '', self._client._user_id, id, asset_name, version, extension)
+        url = '%s/route%s/%s/%s/%s%s%s' % (cdn_url, '/%s' % protocol if protocol else '', self._client._user_id, id, asset_name, version, extension)
 
         if filename:
             url = '%s?%s' % (url, urllib.urlencode({'filename': filename.encode('utf-8', 'ignore')}))
