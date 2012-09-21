@@ -153,20 +153,23 @@ def sign(shared_secret, msg):
 
 DRM_TOKEN_TIMEOUT = 600
 
-def gen_drm_token(user_id, media_id, api_key, rights=None, data=None, callback=None, expires=0, encode=True):
+def gen_drm_token(user_id, media_id, api_key, rights=None, meta=None, callback_url=None, expires=0, max_replay=0, encode=True):
     info = {
         'user_id': user_id,
         'media_id': media_id,
         'expires': expires if expires and isinstance(expires, int) else int(time.time() + DRM_TOKEN_TIMEOUT),
+        'nonce': base64.urlsafe_b64encode(os.urandom(8)),
     }
+    if max_replay and isinstance(max_replay, int):
+        info['max_replay'] = max_replay
     if isinstance(rights, dict):
         info['rights'] = rights
-    if isinstance(data, dict):
-        info['data'] = data
-    if isinstance(callback, (str, unicode)):
-        info['callback'] = callback
+    if isinstance(meta, dict):
+        info['meta'] = meta
+    if isinstance(callback_url, (str, unicode)):
+        info['callback_url'] = callback_url
 
-    info['auth'] = sign(api_key, normalize(data))
+    info['auth'] = sign(api_key, normalize(info))
 
     payload = json.dumps(info)
     if encode:
@@ -410,11 +413,12 @@ class MediaObject(ClientObject):
         url = sign_url(url, self._client._api_key, seclevel=seclevel, asnum=asnum, ip=ip, useragent=useragent, countries=countries, referers=referers, expires=expires) \
             + ('&skin=%s' % skin if skin else '')
         if drm_token:
-            drm_token = gen_drm_token(self._client._user_id, id, self._client._api_key, \
-                                          expires=drm_token.get('expires'), \
-                                          rights=drm_token.get('rights'), \
-                                          data=drm_token.get('data'), \
-                                          callback=drm_token.get('callback'))
+            drm_token = gen_drm_token(self._client._user_id, id, self._client._api_key,
+                                      expires=drm_token.get('expires'),
+                                      rights=drm_token.get('rights'),
+                                      meta=drm_token.get('meta'),
+                                      max_replay=drm_token.get('max_replay'),
+                                      callback_url=drm_token.get('callback_url'))
             url += '&drm_token=%s' % drm_token
         return url
 
@@ -443,7 +447,7 @@ class MediaObject(ClientObject):
         if download or filename:
             protocol = 'http'
 
-        if extension == '.abs':
+        if asset_name == 'abs':
             extension = ''
             if not protocol:
                 raise InvalidParameter('protocol is required for abs asset_name')
