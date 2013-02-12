@@ -29,14 +29,15 @@ except ImportError:
 # Common
 #
 class SecLevel:
-    NONE      = 0
-    DELEGATE  = 1 << 0
-    ASNUM     = 1 << 1
-    IP        = 1 << 2
+    NONE = 0
+    DELEGATE = 1 << 0
+    ASNUM = 1 << 1
+    IP = 1 << 2
     USERAGENT = 1 << 3
-    USEONCE   = 1 << 4
-    COUNTRY   = 1 << 5
-    REFERER   = 1 << 6
+    USEONCE = 1 << 4
+    COUNTRY = 1 << 5
+    REFERER = 1 << 6
+    REFERER_STRICT = 1 << 15
 
 def sign_url(url, secret, seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None):
     # Normalize parameters
@@ -72,7 +73,7 @@ def sign_url(url, secret, seclevel=None, asnum=None, ip=None, useragent=None, co
             if not re.match(r'^-?(?:[a-zA-Z]{2})(?:,[a-zA-Z]{2})*$', countries):
                 raise ValueError('Invalid format for COUNTRY security level parameter.')
             public_secparams.append('cc=%s' % countries.lower())
-        if seclevel & SecLevel.REFERER:
+        if seclevel & SecLevel.REFERER or seclevel & SecLevel.REFERER_STRICT:
             if not referers or len(referers) == 0:
                 raise ValueError('REFERER security level required and no referer list provided.')
             if type(referers) is not list:
