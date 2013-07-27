@@ -438,7 +438,7 @@ class MediaObject(ClientObject):
     def get_stream_url(self, id, asset_name='mp4_h264_aac', seclevel=None, asnum=None, ip=None, useragent=None, countries=None, referers=None, expires=None, download=False, filename=None, version=None, protocol=None, cdn_url='http://cdn.dmcloud.net'):
         if type(id) not in (str, unicode):
             raise InvalidParameter('id is not valid')
-        if protocol not in (None, 'hls', 'rtmp', 'hps', 'http', 'ss', 'hds'):
+        if protocol not in (None, 'hls', 'rtmp', 'hps', 'http', 'ss', 'hds', 'dash'):
             raise InvalidParameter('%s is not a valid streaming protocol' % protocol)
         version = '-%d' % version if version else ''
         if asset_name.startswith('jpeg_thumbnail_'):
@@ -448,7 +448,7 @@ class MediaObject(ClientObject):
         if download or filename:
             protocol = 'http'
 
-        if asset_name == 'abs':
+        if asset_name.startswith('abs'):
             extension = ''
             if not protocol:
                 raise InvalidParameter('protocol is required for abs asset_name')
