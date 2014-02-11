@@ -6,7 +6,7 @@ An eggified, buildout installable verions of DailyMotion's cloudkey.py module.
 Forked from https://github.com/dailymotion/cloudkey-py
 
 
-.. _Python SDK: http://www.dmcloud.net/doc/api/python-sdk.html
+.. _Python SDK: http://www.dmcloud.net/doc/api/sdk-python.html
 .. _cloud-api: http://www.dmcloud.net/doc/api/
 .. _media-api: http://www.dmcloud.net/doc/api/cloud-api.html#media-api
 .. _Media Object: http://www.dmcloud.net/doc/api/cloud-api.html#media-api
